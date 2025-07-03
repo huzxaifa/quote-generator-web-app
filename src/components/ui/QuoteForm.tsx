@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ChevronDownIcon } from "lucide-react";
 import { getAllTopics } from "@/lib/utils";
 
 interface QuoteFormProps {
@@ -12,19 +13,48 @@ interface QuoteFormProps {
 
 export default function QuoteForm({ onSubmit }: QuoteFormProps) {
   const [topic, setTopic] = useState("");
-  const topics = getAllTopics();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [filteredTopics, setFilteredTopics] = useState<string[]>([]);
+  const topics = useMemo(() => getAllTopics(), []);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const trimmedTopic = topic.trim().toLowerCase();
+    const matches = trimmedTopic
+      ? topics.filter((t) => t.toLowerCase().includes(trimmedTopic))
+      : topics;
+    if (JSON.stringify(matches) !== JSON.stringify(filteredTopics)) {
+      setFilteredTopics(matches);
+    }
+  }, [topic, topics, filteredTopics]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleTopicSelect = (selectedTopic: string) => {
+    setTopic(selectedTopic);
+    onSubmit(selectedTopic);
+    setIsDropdownOpen(false);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (topic.trim()) {
       onSubmit(topic);
       setTopic("");
+      setIsDropdownOpen(false);
     }
-  };
-
-  const handleTopicSelect = (selectedTopic: string) => {
-    setTopic(selectedTopic);
-    onSubmit(selectedTopic);
   };
 
   return (
@@ -33,49 +63,42 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
         <Label htmlFor="topic" className="text-base-content">
           Enter or Select a Topic
         </Label>
-        <div className="relative dropdown">
+        <div className="relative" ref={dropdownRef}>
           <Input
             id="topic"
             type="text"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder="e.g., motivation, inspiration, life"
-            className="input input-bordered w-full pr-10"
+            className="input input-bordered w-full pr-10 h-10 text-base"
             aria-label="Topic for quotes"
+            autoComplete="off"
           />
-          <div
-            tabIndex={0}
-            role="button"
-            className="absolute right-2 top-1/2 -translate-y-1/2 btn btn-ghost btn-xs p-1"
-            aria-label="Open topic dropdown"
+          <button
+            type="button"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-transparent hover:bg-base-200 rounded-full"
+            onClick={toggleDropdown}
+            aria-label={isDropdownOpen ? "Close topic dropdown" : "Open topic dropdown"}
           >
-            <svg
-              width="12px"
-              height="12px"
-              className="fill-current opacity-60"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 2048 2048"
-            >
-              <path d="M1799 349l242 241-1017 1017L7 590l242-241 775 775 775-775z" />
-            </svg>
-          </div>
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu bg-base-200 rounded-box z-10 w-full p-2 shadow-lg mt-2 max-h-60 overflow-y-auto"
-          >
-            {topics.map((topicOption) => (
-              <li key={topicOption}>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm w-full text-left capitalize"
-                  onClick={() => handleTopicSelect(topicOption)}
-                  aria-label={`Select ${topicOption} topic`}
-                >
-                  {topicOption}
-                </button>
-              </li>
-            ))}
-          </ul>
+            <ChevronDownIcon
+              className={`w-5 h-5 text-base-content transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+          {isDropdownOpen && filteredTopics.length > 0 && (
+            <ul className="absolute z-10 w-full bg-base-200 rounded-box shadow-lg mt-1 max-h-60 overflow-y-auto p-2 border border-base-300">
+              {filteredTopics.map((topicOption) => (
+                <li key={topicOption} className="w-full">
+                  <button
+                    type="button"
+                    className="w-full text-left capitalize btn btn-ghost btn-sm hover:bg-base-300"
+                    onClick={() => handleTopicSelect(topicOption)}
+                  >
+                    {topicOption}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
       <Button type="submit" className="btn btn-primary w-full">
