@@ -21,7 +21,7 @@ export function getQuotesByTopic(topic: string): Quote[] {
   const category = quotesData.find(
     (item: QuoteCategory) => item.topic.toLowerCase() === normalizedTopic
   );
-  return category ? category.quotes.slice(0, 3) : [];
+  return category ? category.quotes.slice(0, 5) : [];
 }
 
 export function getAllTopics(): string[] {

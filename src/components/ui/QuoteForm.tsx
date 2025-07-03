@@ -18,16 +18,19 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
   const topics = useMemo(() => getAllTopics(), []);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Filter topics and open dropdown on typing
   useEffect(() => {
     const trimmedTopic = topic.trim().toLowerCase();
     const matches = trimmedTopic
       ? topics.filter((t) => t.toLowerCase().includes(trimmedTopic))
       : topics;
-    if (JSON.stringify(matches) !== JSON.stringify(filteredTopics)) {
-      setFilteredTopics(matches);
+    setFilteredTopics(matches);
+    if (trimmedTopic) {
+      setIsDropdownOpen(true);
     }
-  }, [topic, topics, filteredTopics]);
+  }, [topic, topics]);
 
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -40,12 +43,18 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
 
   const handleTopicSelect = (selectedTopic: string) => {
     setTopic(selectedTopic);
-    onSubmit(selectedTopic);
     setIsDropdownOpen(false);
+    setTimeout(() => {
+      setIsDropdownOpen(false);
+    }, 0);
   };
 
   const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
+    const trimmedTopic = topic.trim().toLowerCase();
+    const isValidTopic = topics.some((t) => t.toLowerCase() === trimmedTopic);
+    if (!isValidTopic) {
+      setIsDropdownOpen((prev) => !prev);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -85,13 +94,16 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
             />
           </button>
           {isDropdownOpen && filteredTopics.length > 0 && (
-            <ul className="absolute z-10 w-full bg-base-200 rounded-box shadow-lg mt-1 max-h-60 overflow-y-auto p-2 border border-base-300">
+            <ul className="absolute z-20 w-full !bg-[#faeceb] rounded-box shadow-lg mt-1 max-h-60 overflow-y-auto p-2 border border-base-300">
               {filteredTopics.map((topicOption) => (
                 <li key={topicOption} className="w-full">
                   <button
                     type="button"
-                    className="w-full text-left capitalize btn btn-ghost btn-sm hover:bg-base-300"
-                    onClick={() => handleTopicSelect(topicOption)}
+                    className="w-full text-left capitalize py-2 px-4 hover:bg-base-300 rounded-md focus:outline-none"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleTopicSelect(topicOption);
+                    }}
                   >
                     {topicOption}
                   </button>
