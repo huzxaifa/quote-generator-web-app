@@ -23,3 +23,7 @@ export function getQuotesByTopic(topic: string): Quote[] {
   );
   return category ? category.quotes.slice(0, 3) : [];
 }
+
+export function getAllTopics(): string[] {
+  return quotesData.map((category: QuoteCategory) => category.topic);
+}
