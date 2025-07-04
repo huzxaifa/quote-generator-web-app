@@ -61,8 +61,9 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (topic.trim()) {
-      setSelectedTopic(topic);
-      onSubmit(topic);
+      const selectedTopic = filteredTopics.length === 1 ? filteredTopics[0] : topic;
+      setSelectedTopic(selectedTopic);
+      onSubmit(selectedTopic);
       setTopic("");
       setIsDropdownOpen(false);
     }
@@ -71,7 +72,7 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="form-control">
-        <Label htmlFor="topic" className="text-base-content">
+        <Label htmlFor="topic" className="text-white mb-2">
           Enter or Select a Topic
         </Label>
         <div className="relative" ref={dropdownRef}>
@@ -80,8 +81,14 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
             type="text"
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && filteredTopics.length === 1) {
+                e.preventDefault();
+                handleTopicSelect(filteredTopics[0]);
+              }
+            }}
             placeholder="e.g., motivation, inspiration, life"
-            className="input input-bordered w-full pr-10 h-10 text-base"
+            className="input input-bordered w-full pr-10 h-10 text-white placeholder:text-white/70"
             aria-label="Topic for quotes"
             autoComplete="off"
           />
@@ -92,7 +99,7 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
             aria-label={isDropdownOpen ? "Close topic dropdown" : "Open topic dropdown"}
           >
             <ChevronDownIcon
-              className={`w-5 h-5 text-base-content transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
+              className={`w-5 h-5 text-white transition-transform duration-200 ${isDropdownOpen ? "rotate-180" : ""}`}
             />
           </button>
           {isDropdownOpen && filteredTopics.length > 0 && (
@@ -119,7 +126,7 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
         Get Quotes
       </Button>
       {selectedTopic && (
-        <p className="mt-4 text-center text-base-content capitalize">
+        <p className="mt-4 text-center text-white capitalize">
           Showing quotes for: {selectedTopic}
         </p>
       )}

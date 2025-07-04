@@ -1,5 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import '@fontsource/poppins/400.css';
+@import '@fontsource/poppins/700.css';
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
 
 @custom-variant dark (&:is(.dark *));
 

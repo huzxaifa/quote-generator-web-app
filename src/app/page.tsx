@@ -17,12 +17,9 @@ export default function Home() {
 
   return (
     <div className="page-background">
-      <main className="container mx-auto p-4 relative z-10">
-        <div className="navbar bg-neutral text-neutral-content">
-            <button className="btn btn-ghost text-xl">daisyUI</button>
-          </div>
+      <main className="container mx-auto pt-20 pb-4 px-4 relative z-10">
         <div className="container mx-auto max-w-3xl">
-          <h1 className="text-4xl font-bold text-center text-base-content mb-8">
+          <h1 className="text-3xl font-bold text-center mb-6 text-white">
             Quote Generator
           </h1>
           <div className="mb-12">
@@ -34,7 +31,7 @@ export default function Home() {
                 <QuoteCard key={index} quote={quote} />
               ))
             ) : (
-              <p className="text-center text-base-content/70 col-span-full">
+              <p className="text-center text-white col-span-full">
                 Enter a topic to see quotes!
               </p>
             )}

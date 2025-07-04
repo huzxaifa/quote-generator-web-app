@@ -9,14 +9,14 @@ interface QuoteCardProps {
 
 export default function QuoteCard({ quote }: QuoteCardProps) {
   return (
-    <Card className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+    <Card className="card bg-black/80 shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <CardContent className="pt-6">
-        <blockquote className="text-lg italic font-medium text-base-content">
+        <blockquote className="text-lg italic font-medium text-white">
           "{quote.text}"
         </blockquote>
       </CardContent>
       <CardFooter className="text-right">
-        <cite className="text-base-content/70">— {quote.author}</cite>
+        <cite className="text-white/80">— {quote.author}</cite>
       </CardFooter>
     </Card>
   );
