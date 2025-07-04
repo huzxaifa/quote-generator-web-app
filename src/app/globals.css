@@ -112,6 +112,15 @@
   --sidebar-ring: oklch(0.551 0.027 264.364);
 }
 
+.page-background {
+  background-image: url('https://res.cloudinary.com/fay/image/upload/v1729824220/tutorials/my-daisy-app/jeremy-thomas-E0AHdsENmDg-unsplash_o6g1ov.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  position: relative;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

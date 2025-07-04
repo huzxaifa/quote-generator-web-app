@@ -15,6 +15,7 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
   const [topic, setTopic] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [filteredTopics, setFilteredTopics] = useState<string[]>([]);
+  const [selectedTopic, setSelectedTopic] = useState("");
   const topics = useMemo(() => getAllTopics(), []);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -60,6 +61,7 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (topic.trim()) {
+      setSelectedTopic(topic);
       onSubmit(topic);
       setTopic("");
       setIsDropdownOpen(false);
@@ -94,12 +96,12 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
             />
           </button>
           {isDropdownOpen && filteredTopics.length > 0 && (
-            <ul className="absolute z-20 w-full !bg-[#faeceb] rounded-box shadow-lg mt-1 max-h-60 overflow-y-auto p-2 border border-base-300">
+            <ul className="absolute z-20 w-full bg-[#ffffff] rounded-box shadow-lg mt-1 max-h-60 overflow-y-auto p-2 border border-base-300">
               {filteredTopics.map((topicOption) => (
-                <li key={topicOption} className="w-full">
+                <li key={topicOption} className="w-full relative">
                   <button
                     type="button"
-                    className="w-full text-left capitalize py-2 px-4 hover:bg-base-300 rounded-md focus:outline-none"
+                    className="w-full text-left capitalize py-2 px-4 hover:bg-base-300 rounded-md focus:outline-none text-base-content"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleTopicSelect(topicOption);
@@ -116,6 +118,11 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
       <Button type="submit" className="btn btn-primary w-full">
         Get Quotes
       </Button>
+      {selectedTopic && (
+        <p className="mt-4 text-center text-base-content capitalize">
+          Showing quotes for: {selectedTopic}
+        </p>
+      )}
     </form>
   );
 }
