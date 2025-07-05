@@ -11,7 +11,7 @@ export default function QuoteCard({ quote }: QuoteCardProps) {
   return (
     <Card className="card bg-black/80 shadow-xl hover:shadow-2xl transition-shadow duration-300">
       <CardContent className="pt-6">
-        <blockquote className="text-lg italic font-medium text-white">
+        <blockquote className="text-lg italic font-medium text-white before:content-['\201C'] after:content-['\201D']">
           {quote.text}
         </blockquote>
       </CardContent>
