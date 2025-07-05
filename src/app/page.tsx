@@ -31,7 +31,7 @@ export default function Home() {
                 <QuoteCard key={index} quote={quote} />
               ))
             ) : (
-              <p className="text-center text-white col-span-full">
+              <p className="text-center text-white text-2xl col-span-full">
                 Enter a topic to see quotes!
               </p>
             )}

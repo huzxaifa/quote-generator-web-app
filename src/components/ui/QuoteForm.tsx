@@ -126,8 +126,8 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
         Get Quotes
       </Button>
       {selectedTopic && (
-        <p className="mt-4 text-center text-white capitalize">
-          Showing quotes for: {selectedTopic}
+        <p className="mt-4 text-center text-white text-2xl font-bold capitalize">
+          {selectedTopic}
         </p>
       )}
     </form>
