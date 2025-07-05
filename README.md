@@ -22,10 +22,8 @@ The Quote Generator is a simple web application designed to provide users with q
 
 Based on the observed behavior and typical web development practices, this application likely utilizes:
 
--   **Frontend**: React.js (given the dynamic nature and component-based structure)
--   **Deployment**: Vercel (as indicated by the URL `vercel.app`)
-
-Further analysis would be required to determine the exact backend technology and API used for fetching quotes.
+-   **Frontend**: Next.js, daisyUI, shadcn/ui
+-   **Deployment**: Vercel
 
 ## Future Enhancements (Potential)
 
