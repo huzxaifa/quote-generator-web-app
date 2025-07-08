@@ -5,7 +5,7 @@
 - Run `npm run dev`, access `http://localhost:3000`.
 
 ## Vercel Deployment Access Link
-- https://quote-generator-web-app-iota.vercel.app/
+- https://quote-generator-theta-eight.vercel.app/
 
 ## Overview
 The Quote Generator Web App is a Next.js application that allows users to enter or select a topic to retrieve inspirational quotes. The app features a polished UI with a night sky background, an accessible dropdown for topic selection, and a clear display of the selected topic. This report summarizes the functionalities, components, and technical details of the current implementation.
