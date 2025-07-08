@@ -7,6 +7,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Quote Generator",
   description: "Generate quotes based on your favorite topics",
+  icons: {
+    icon: '/quote-generator-icon-removebg-preview-removebg-preview.ico',
+  },
 };
 
 export default function RootLayout({

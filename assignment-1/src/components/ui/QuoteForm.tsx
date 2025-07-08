@@ -82,7 +82,21 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && filteredTopics.length === 1) {
+              if (e.key === "Enter" && topic.trim()) {
+                e.preventDefault();
+                const selectedTopic = filteredTopics.length === 1 ? filteredTopics[0] : topic;
+                setSelectedTopic(selectedTopic);
+                onSubmit(selectedTopic);
+                setTopic("");
+                setIsDropdownOpen(false);
+              } else if (e.key === "Enter" && filteredTopics.length > 0 && !topic.trim()) {
+                e.preventDefault();
+                const selectedTopic = filteredTopics[0]; // Use the last selected topic
+                setSelectedTopic(selectedTopic);
+                onSubmit(selectedTopic);
+                setTopic("");
+                setIsDropdownOpen(false);
+              } else if (e.key === "Enter" && filteredTopics.length === 1) {
                 e.preventDefault();
                 handleTopicSelect(filteredTopics[0]);
               }
@@ -103,7 +117,7 @@ export default function QuoteForm({ onSubmit }: QuoteFormProps) {
             />
           </button>
           {isDropdownOpen && filteredTopics.length > 0 && (
-            <ul className="absolute z-20 w-full bg-[#ffffff] rounded-box shadow-lg mt-1 max-h-60 overflow-y-auto p-2 border border-base-300">
+            <ul className="absolute z-20 w-full custom-dropdown mt-1 max-h-60 overflow-y-auto border border-base-300">
               {filteredTopics.map((topicOption) => (
                 <li key={topicOption} className="w-full relative">
                   <button
