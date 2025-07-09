@@ -1,13 +1,10 @@
 <a name="readme-top"></a>
 <div align="center">
 
-  ![Project Banner](readme_assets/readme_banner.png#gh-dark-mode-only)
-  ![Project Banner](readme_assets/readme_banner-light.png#gh-light-mode-only)
-
-  <h1>GPT-4 Summarizer Web</h1>
+  <h1>AI Blog Summarizer</h1>
   
   <p>
-    well-designed article summarizer web application using openAI's GPT-4 model powered by Rapid API - built with React & Redux.js
+    well-designed blog summarizer web application using Rapid API
   </p>
 
 <!-- Badges -->
