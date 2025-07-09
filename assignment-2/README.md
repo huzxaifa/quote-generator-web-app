@@ -140,7 +140,7 @@ Go to root folder and execute the following command in order to run the webapp:
 
 Huzaifa Khalid - [@huzaifakhalid02](https://www.linkedin.com/in/huzaifakhalid02/)
 
-Project Link: [https://github.com/huzxaifa/Nexium_Internship/assignment-2](https://github.com/huzxaifa/Nexium_Internship/assignment-2)
+Project Link: [https://github.com/huzxaifa/Nexium_Internship/tree/main/assignment-2]([https://github.com/huzxaifa/Nexium_Internship/assignment-2](https://github.com/huzxaifa/Nexium_Internship/tree/main/assignment-2))
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
