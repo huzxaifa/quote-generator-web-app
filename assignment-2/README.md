@@ -6,38 +6,7 @@
   <p>
     Well-designed Blog Summarizer web application using Rapid API
   </p>
-
-<!-- Badges -->
-<p>
-  <a href="https://github.com/huzxaifa/AI-Blog-Summarizer/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/huzxaifa/AI-Blog-Summarizer" alt="contributors" />
-  </a>
-  <a href="">
-    <img src="https://img.shields.io/github/last-commit/huzxaifa/AI-Blog-Summarizer" alt="last update" />
-  </a>
-  <a href="https://github.com/huzxaifa/AI-Blog-Summarizer/network/members">
-    <img src="https://img.shields.io/github/forks/huzxaifa/AI-Blog-Summarizer" alt="forks" />
-  </a>
-  <a href="https://github.com/huzxaifa/GPT4-Summarizer-Web/stargazers">
-    <img src="https://img.shields.io/github/stars/huzxaifa/AI-Blog-Summarizer" alt="stars" />
-  </a>
-  <a href="https://github.com/huzxaifa/GPT4-Summarizer-Web/issues/">
-    <img src="https://img.shields.io/github/issues/ladunjexa/AI-Blog-Summarizer" alt="open issues" />
-  </a>
-  <a href="https://github.com/huzxaifa/GPT4-Summarizer-Web/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/ladunjexa/AI-Blog-Summarizer.svg" alt="license" />
-  </a>
-</p>
    
- <h4>
-    <a href="https://gpt-4-summarizer-web.vercel.app/">View Demo</a>
-  <span> · </span>
-    <a href="https://github.com/huzxaifa/AI-Blog-Summarizer">Documentation</a>
-  <span> · </span>
-    <a href="https://github.com/huzxaifa/AI-Blog-Summarizer/issues/">Report Bug</a>
-  <span> · </span>
-    <a href="https://github.com/huzxaifa/AI-Blog-Summarizer/issues/">Request Feature</a>
-  </h4>
 </div>
 
 <br />
@@ -80,7 +49,8 @@ This repository houses a well-designed Blog Summarizer Web Application by Rapid 
 
 Here is the folder structure of AI-Blog Summarizer.
 ```bash
-AI Blog Summarizer/
+Nexium_Internship/
+assignment-2/
 |- public/
 |- src/
   |-- assets/
@@ -119,7 +89,7 @@ AI Blog Summarizer/
 <!-- ENV VARIABLES -->
 ### :key: Environment Variables
 
-In order to use this GPT4 Summarizer Webapp you have to add some environment variables to .env file,
+In order to use this Blog Summarizer Web App you have to add some environment variables to .env file,
 
 create `.env` file in root folder & add the following environment variable:
 ```env
@@ -165,51 +135,14 @@ Go to root folder and execute the following command in order to run the webapp:
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- Contributing -->
-## :wave: Contributing
-
-<a href="https://github.com/huzxaifa/AI Blog Suummarizer/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=huzxaifa/AI Blog Summarizer" />
-</a>
-
-
-Contributions are always welcome!
-
-See [`contributing.md`](https://contributing.md/) for ways to get started.
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- License -->
-## :warning: License
-
-Distributed under the MIT License. See [LICENSE.txt](https://github.com/ladunjexa/GPT4-Summarizer-Web/blob/main/LICENSE) for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- Contact -->
 ## :handshake: Contact
 
-Liron Abutbul - [@lironabutbul6](https://twitter.com/lironabutbul6) - [@ladunjexa](https://t.me/ladunjexa)
+Huzaifa Khalid - [@huzaifakhalid02](https://www.linkedin.com/in/huzaifakhalid02/)
 
-Project Link: [https://github.com/ladunjexa/GPT4-Summarizer-Web](https://github.com/ladunjexa/GPT4-Summarizer-Web)
+Project Link: [https://github.com/huzxaifa/Nexium_Internship/assignment-2](https://github.com/huzxaifa/Nexium_Internship/assignment-2)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- Acknowledgments -->
-## :gem: Acknowledgements
-
-This section used to mention useful resources and libraries that used in the GPT4 Summarizer Webapp:
 
 #### client-side
 
