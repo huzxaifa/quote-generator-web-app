@@ -1,42 +1,42 @@
 <a name="readme-top"></a>
 <div align="center">
 
-  <h1>AI Blog Summarizer</h1>
+  <h1>AI-Blog Summarizer</h1>
   
   <p>
-    well-designed blog summarizer web application using Rapid API
+    Well-designed Blog Summarizer web application using Rapid API
   </p>
 
 <!-- Badges -->
 <p>
-  <a href="https://github.com/ladunjexa/GPT4-Summarizer-Web/graphs/contributors">
-    <img src="https://img.shields.io/github/contributors/ladunjexa/GPT4-Summarizer-Web" alt="contributors" />
+  <a href="https://github.com/huzxaifa/AI-Blog-Summarizer/graphs/contributors">
+    <img src="https://img.shields.io/github/contributors/huzxaifa/AI-Blog-Summarizer" alt="contributors" />
   </a>
   <a href="">
-    <img src="https://img.shields.io/github/last-commit/ladunjexa/GPT4-Summarizer-Web" alt="last update" />
+    <img src="https://img.shields.io/github/last-commit/huzxaifa/AI-Blog-Summarizer" alt="last update" />
   </a>
-  <a href="https://github.com/ladunjexa/GPT4-Summarizer-Web/network/members">
-    <img src="https://img.shields.io/github/forks/ladunjexa/GPT4-Summarizer-Web" alt="forks" />
+  <a href="https://github.com/huzxaifa/AI-Blog-Summarizer/network/members">
+    <img src="https://img.shields.io/github/forks/huzxaifa/AI-Blog-Summarizer" alt="forks" />
   </a>
-  <a href="https://github.com/ladunjexa/GPT4-Summarizer-Web/stargazers">
-    <img src="https://img.shields.io/github/stars/ladunjexa/GPT4-Summarizer-Web" alt="stars" />
+  <a href="https://github.com/huzxaifa/GPT4-Summarizer-Web/stargazers">
+    <img src="https://img.shields.io/github/stars/huzxaifa/AI-Blog-Summarizer" alt="stars" />
   </a>
-  <a href="https://github.com/ladunjexa/GPT4-Summarizer-Web/issues/">
-    <img src="https://img.shields.io/github/issues/ladunjexa/GPT4-Summarizer-Web" alt="open issues" />
+  <a href="https://github.com/huzxaifa/GPT4-Summarizer-Web/issues/">
+    <img src="https://img.shields.io/github/issues/ladunjexa/AI-Blog-Summarizer" alt="open issues" />
   </a>
-  <a href="https://github.com/ladunjexa/GPT4-Summarizer-Web/blob/master/LICENSE">
-    <img src="https://img.shields.io/github/license/ladunjexa/GPT4-Summarizer-Web.svg" alt="license" />
+  <a href="https://github.com/huzxaifa/GPT4-Summarizer-Web/blob/master/LICENSE">
+    <img src="https://img.shields.io/github/license/ladunjexa/AI-Blog-Summarizer.svg" alt="license" />
   </a>
 </p>
    
  <h4>
     <a href="https://gpt-4-summarizer-web.vercel.app/">View Demo</a>
   <span> · </span>
-    <a href="https://github.com/ladunjexa/GPT4-Summarizer-Web">Documentation</a>
+    <a href="https://github.com/huzxaifa/AI-Blog-Summarizer">Documentation</a>
   <span> · </span>
-    <a href="https://github.com/ladunjexa/GPT4-Summarizer-Web/issues/">Report Bug</a>
+    <a href="https://github.com/huzxaifa/AI-Blog-Summarizer/issues/">Report Bug</a>
   <span> · </span>
-    <a href="https://github.com/ladunjexa/GPT4-Summarizer-Web/issues/">Request Feature</a>
+    <a href="https://github.com/huzxaifa/AI-Blog-Summarizer/issues/">Request Feature</a>
   </h4>
 </div>
 
@@ -69,18 +69,18 @@
 ## :star2: About the Project
 
 <div align="center">
-  <img src="readme_assets/mock.png" height="auto" width="90%"/>
+  <img src="readme_assets/Blog_Summarizer.png" height="auto" width="90%"/>
 </div>
 <br />
 
-This repository houses a well-designed Article Summarizer Web Application built with React & Redux.js using OpenAI's GPT-4 model powered by Rapid API 🤖
+This repository houses a well-designed Blog Summarizer Web Application by Rapid API 🤖
 
 <!-- Folder Structure -->
 ### :bangbang: Folder Structure
 
-Here is the folder structure of GPT4 Summarizer Web.
+Here is the folder structure of AI-Blog Summarizer.
 ```bash
-GPT4-Summarizer-Web/
+AI Blog Summarizer/
 |- public/
 |- src/
   |-- assets/
@@ -133,7 +133,7 @@ VITE_RAPID_API_KEY=<RAPID_API_KEY>
 Download or clone this repo by using the command below:
 
 ```bash
- https://github.com/ladunjexa/GPT4-Summarizer-Web.git
+ https://github.com/huzxaifa/Nexium_Internship/assignment-2.git
 ```
 
 #### Step 2:
@@ -168,8 +168,8 @@ Go to root folder and execute the following command in order to run the webapp:
 <!-- Contributing -->
 ## :wave: Contributing
 
-<a href="https://github.com/ladunjexa/GPT4-Summarizer-Web/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=ladunjexa/GPT4-Summarizer-Web" />
+<a href="https://github.com/huzxaifa/AI Blog Suummarizer/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=huzxaifa/AI Blog Summarizer" />
 </a>
 
 
