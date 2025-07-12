@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import axios from "axios";
 import { useLazyGetSummaryQuery } from "../services/article";
 import { copy, linkIcon, loader, tick } from "../assets";
 
@@ -7,9 +7,12 @@ const Demo = () => {
   const [article, setArticle] = useState({
     url: "",
     summary: "",
+    translatedSummary: "",
   });
   const [allArticles, setAllArticles] = useState([]);
   const [copied, setCopied] = useState("");
+  const [language, setLanguage] = useState("ur"); // Default language to Urdu
+  const [isTranslating, setIsTranslating] = useState(false);
 
   const [getSummary, { error, isFetching }] = useLazyGetSummaryQuery();
 
@@ -17,7 +20,6 @@ const Demo = () => {
     const articlesFromLocalStorage = JSON.parse(
       localStorage.getItem(`articles`)
     );
-
     if (articlesFromLocalStorage) {
       setAllArticles(articlesFromLocalStorage);
     }
@@ -25,16 +27,12 @@ const Demo = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const { data } = await getSummary({ articleUrl: article.url });
-
     if (data?.summary) {
-      const newArticle = { ...article, summary: data.summary };
+      const newArticle = { ...article, summary: data.summary, translatedSummary: "" };
       const updatedAllArticles = [newArticle, ...allArticles];
-
       setArticle(newArticle);
       setAllArticles(updatedAllArticles);
-
       localStorage.setItem(`articles`, JSON.stringify(updatedAllArticles));
     }
   };
@@ -43,6 +41,26 @@ const Demo = () => {
     setCopied(copyUrl);
     navigator.clipboard.writeText(copyUrl);
     setTimeout(() => setCopied(false), 3000);
+  };
+
+  const handleTranslate = async () => {
+    if (!article.summary) return;
+    setIsTranslating(true);
+    try {
+      const truncatedSummary = article.summary.length > 500 ? article.summary.substring(0, 500) : article.summary;
+      console.log('Frontend truncated summary length:', truncatedSummary.length);
+      const response = await axios.post("http://localhost:3000/translate", {
+        text: truncatedSummary,
+        source: "en",
+        target: language,
+      });
+      setArticle({ ...article, translatedSummary: response.data || "No translation available" });
+      setIsTranslating(false);
+    } catch (error) {
+      console.error("Translation error:", error);
+      setIsTranslating(false);
+      setArticle({ ...article, translatedSummary: error.response?.data || "Translation failed" });
+    }
   };
 
   return (
@@ -79,7 +97,7 @@ const Demo = () => {
           {allArticles.map((article, index) => (
             <div
               key={`link-${index}`}
-              onClick={() => setArticle(article)}
+              onClick={() => setArticle({ ...article, translatedSummary: "" })}
               className="link_card"
             >
               <div className="copy_btn" onClick={() => handleCopy(article.url)}>
@@ -103,7 +121,7 @@ const Demo = () => {
           <img src={loader} alt="loader" className="w-20 h-20 object-contain" />
         ) : error ? (
           <p className="font-inter font-bold text-black text-center">
-            Well, that wasn&apos;t supposed to happen...
+            Well, that wasn't supposed to happen...
             <br />
             <span className="font-satoshi font-normal text-gray-700">
               {error?.data?.error}
@@ -119,6 +137,41 @@ const Demo = () => {
                 <p className="font-inter font-medium text-sm text-gray-700">
                   {article.summary}
                 </p>
+              </div>
+              <div className="flex flex-col gap-3">
+                <h2 className="font-satoshi font-bold text-gray-600 text-xl">
+                  Translated <span className="blue_gradient">Summary</span>
+                </h2>
+                <div className="flex gap-2">
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    className="rounded bg-blue-100 py-1 px-2 text-sm text-cyan-600"
+                    disabled={isTranslating || !article.summary}
+                  >
+                    <option value="ur">Urdu</option>
+                    <option value="fr">French</option>
+                    <option value="ru">Russian</option>
+                    <option value="de">German</option>
+                    <option value="es">Spanish</option>
+                  </select>
+                  <button
+                    onClick={handleTranslate}
+                    className="rounded bg-cyan-700 py-2 px-4 text-white"
+                    disabled={isTranslating || !article.summary}
+                  >
+                    {isTranslating ? "Translating..." : "Translate"}
+                  </button>
+                </div>
+                {article.translatedSummary && (
+                  <div className="summary_box">
+                    <p className="font-inter font-medium text-sm text-gray-700">
+                      {article.translatedSummary.includes('Translation failed')
+                        ? `Error: ${article.translatedSummary}`
+                        : article.translatedSummary}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           )
