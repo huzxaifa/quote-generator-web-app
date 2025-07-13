@@ -11,15 +11,13 @@ const Demo = () => {
   });
   const [allArticles, setAllArticles] = useState([]);
   const [copied, setCopied] = useState("");
-  const [language, setLanguage] = useState("ur"); // Default language to Urdu
+  const [language, setLanguage] = useState("ur");
   const [isTranslating, setIsTranslating] = useState(false);
 
   const [getSummary, { error, isFetching }] = useLazyGetSummaryQuery();
 
   useEffect(() => {
-    const articlesFromLocalStorage = JSON.parse(
-      localStorage.getItem(`articles`)
-    );
+    const articlesFromLocalStorage = JSON.parse(localStorage.getItem(`articles`));
     if (articlesFromLocalStorage) {
       setAllArticles(articlesFromLocalStorage);
     }
@@ -34,6 +32,15 @@ const Demo = () => {
       setArticle(newArticle);
       setAllArticles(updatedAllArticles);
       localStorage.setItem(`articles`, JSON.stringify(updatedAllArticles));
+      // Store summary in Supabase
+      try {
+        await axios.post("http://localhost:3000/store-summary", {
+          url: article.url,
+          summary: data.summary,
+        });
+      } catch (error) {
+        console.error("Failed to store summary:", error);
+      }
     }
   };
 
@@ -47,19 +54,32 @@ const Demo = () => {
     if (!article.summary) return;
     setIsTranslating(true);
     try {
-      const truncatedSummary = article.summary.length > 500 ? article.summary.substring(0, 500) : article.summary;
-      console.log('Frontend truncated summary length:', truncatedSummary.length);
       const response = await axios.post("http://localhost:3000/translate", {
-        text: truncatedSummary,
+        text: article.summary,
+        url: article.url,
         source: "en",
         target: language,
       });
-      setArticle({ ...article, translatedSummary: response.data || "No translation available" });
+      const newArticle = {
+        ...article,
+        translatedSummary: response.data || "No translation available",
+        translatedLanguage: language,
+      };
+      const updatedAllArticles = [
+        newArticle,
+        ...allArticles.filter((_, i) => i !== 0),
+      ];
+      setArticle(newArticle);
+      setAllArticles(updatedAllArticles);
+      localStorage.setItem(`articles`, JSON.stringify(updatedAllArticles));
       setIsTranslating(false);
     } catch (error) {
       console.error("Translation error:", error);
       setIsTranslating(false);
-      setArticle({ ...article, translatedSummary: error.response?.data || "Translation failed" });
+      setArticle({
+        ...article,
+        translatedSummary: error.response?.data || "Translation failed",
+      });
     }
   };
 
@@ -97,7 +117,9 @@ const Demo = () => {
           {allArticles.map((article, index) => (
             <div
               key={`link-${index}`}
-              onClick={() => setArticle({ ...article, translatedSummary: "" })}
+              onClick={() =>
+                setArticle({ ...article, translatedSummary: "" })
+              }
               className="link_card"
             >
               <div className="copy_btn" onClick={() => handleCopy(article.url)}>
