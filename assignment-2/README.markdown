@@ -1,6 +1,6 @@
 # Blog Summarizer
 
-A web application that summarizes blog articles from URLs, stores summaries in Supabase, saves full article text in MongoDB, and translates summaries into multiple languages using the MyMemory API.
+A web application that summarizes blog articles from URLs, stores summaries in Supabase, saves full article text in MongoDB, and translates summaries into multiple languages.
 
 ## Features
 
@@ -8,7 +8,7 @@ A web application that summarizes blog articles from URLs, stores summaries in S
 - **Storage**:
   - Summaries are stored in a Supabase table (`summaries`).
   - Full article text is stored in a MongoDB collection (`full_text_articles`).
-- **Translation**: Translates summaries into languages like Hindi, Urdu, French, German, Russian, and Spanish using the MyMemory API.
+- **Translation**: Translates summaries into languages like Urdu, French, German, Russian, and Spanish using the MyMemory API.
 - **Frontend**: Built with React and Vite for a responsive UI.
 - **Backend**: Node.js/Express server handles API requests, database interactions, and article scraping.
 
@@ -124,7 +124,7 @@ A web application that summarizes blog articles from URLs, stores summaries in S
 
 4. **Translate**:
 
-   - Select a language (e.g., Urdu, Hindi) and click "Translate" to translate the summary using the MyMemory API.
+   - Select a language (e.g., Urdu) and click "Translate" to translate the summary.
 
 ## Project Structure
 
@@ -149,7 +149,6 @@ blog-summarizer/
 
 ## Notes
 
-- **MyMemory API Limits**: Free tier limits to 50,000 characters/day with an API key. Register at mymemory.translated.net.
 - **MongoDB Atlas**: Ensure IP is whitelisted in `Network Access`. Use `readWrite` permissions for the database user.
 - **Supabase**: Ensure `anon` key has insert permissions for the `summaries` table if RLS is enabled.
 - **Text Extraction**: Full text is extracted using Cheerio. Adjust selectors in `server/index.js` if blog content isn’t captured correctly.
