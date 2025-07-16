@@ -8,6 +8,7 @@ const Demo = () => {
     url: "",
     summary: "",
     translatedSummary: "",
+    summaryError: "",
   });
   const [allArticles, setAllArticles] = useState([]);
   const [copied, setCopied] = useState("");
@@ -19,7 +20,14 @@ const Demo = () => {
   useEffect(() => {
     const articlesFromLocalStorage = JSON.parse(localStorage.getItem(`articles`));
     if (articlesFromLocalStorage) {
-      setAllArticles(articlesFromLocalStorage);
+      const uniqueArticles = Object.values(
+        articlesFromLocalStorage.reduce((acc, article) => {
+          acc[article.url] = article;
+          return acc;
+        }, {})
+      );
+      setAllArticles(uniqueArticles);
+      localStorage.setItem(`articles`, JSON.stringify(uniqueArticles));
     }
   }, []);
 
@@ -28,11 +36,20 @@ const Demo = () => {
     const { data } = await getSummary({ articleUrl: article.url });
     if (data?.summary) {
       const newArticle = { ...article, summary: data.summary, translatedSummary: "" };
-      const updatedAllArticles = [newArticle, ...allArticles];
+      const isDuplicate = allArticles.some(
+        (existingArticle) => existingArticle.url === article.url
+      );
+      let updatedAllArticles;
+      if (isDuplicate) {
+        updatedAllArticles = allArticles.map((existingArticle) =>
+          existingArticle.url === article.url ? newArticle : existingArticle
+        );
+      } else {
+        updatedAllArticles = [newArticle, ...allArticles];
+      }
       setArticle(newArticle);
       setAllArticles(updatedAllArticles);
       localStorage.setItem(`articles`, JSON.stringify(updatedAllArticles));
-      // Store summary in Supabase
       try {
         await axios.post("http://localhost:3000/store-summary", {
           url: article.url,
@@ -40,6 +57,10 @@ const Demo = () => {
         });
       } catch (error) {
         console.error("Failed to store summary:", error);
+        setArticle({
+          ...article,
+          summaryError: error.response?.data || "Failed to store summary in Supabase",
+        });
       }
     }
   };
@@ -84,7 +105,7 @@ const Demo = () => {
   };
 
   return (
-    <section className="mt-16 w-full max-w-xl">
+    <section className="mt-16 w-full max-w-4xl">
       {/* Search */}
       <div className="flex flex-col w-full gap-2">
         <form
@@ -115,13 +136,7 @@ const Demo = () => {
         {/* Browse URL History */}
         <div className="flex flex-col gap-1 max-h-60 overflow-y-auto">
           {allArticles.map((article, index) => (
-            <div
-              key={`link-${index}`}
-              onClick={() =>
-                setArticle({ ...article, translatedSummary: "" })
-              }
-              className="link_card"
-            >
+            <div key={`link-${index}`} className="link_card">
               <div className="copy_btn" onClick={() => handleCopy(article.url)}>
                 <img
                   src={copied === article.url ? tick : copy}
@@ -129,9 +144,26 @@ const Demo = () => {
                   className="w-[40%] h-[40%] object-contain"
                 />
               </div>
-              <p className="flex-1 font-satoshi text-blue-700 font-medium text-sm truncate">
+              <p
+                className="flex-1 font-satoshi text-blue-700 font-medium text-sm truncate"
+                onClick={() =>
+                  setArticle({ ...article, translatedSummary: "", summaryError: "" })
+                }
+              >
                 {article.url}
               </p>
+              <button
+                className="font-satoshi text-red-600 text-sm"
+                onClick={() => {
+                  const updatedArticles = allArticles.filter(
+                    (_, i) => i !== index
+                  );
+                  setAllArticles(updatedArticles);
+                  localStorage.setItem('articles', JSON.stringify(updatedArticles));
+                }}
+              >
+                Delete
+              </button>
             </div>
           ))}
         </div>
@@ -151,49 +183,60 @@ const Demo = () => {
           </p>
         ) : (
           article.summary && (
-            <div className="flex flex-col gap-3">
-              <h2 className="font-satoshi font-bold text-gray-600 text-xl">
-                Article <span className="blue_gradient">Summary</span>
-              </h2>
-              <div className="summary_box">
-                <p className="font-inter font-medium text-sm text-gray-700">
-                  {article.summary}
+            <div className="flex flex-col gap-3 w-full">
+              {article.summaryError && (
+                <p className="font-inter text-sm text-red-600">
+                  {article.summaryError}
                 </p>
-              </div>
-              <div className="flex flex-col gap-3">
-                <h2 className="font-satoshi font-bold text-gray-600 text-xl">
-                  Translated <span className="blue_gradient">Summary</span>
-                </h2>
-                <div className="flex gap-2">
-                  <select
-                    value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
-                    className="rounded bg-blue-100 py-1 px-2 text-sm text-cyan-600"
-                    disabled={isTranslating || !article.summary}
-                  >
-                    <option value="ur">Urdu</option>
-                    <option value="fr">French</option>
-                    <option value="ru">Russian</option>
-                    <option value="de">German</option>
-                    <option value="es">Spanish</option>
-                  </select>
-                  <button
-                    onClick={handleTranslate}
-                    className="rounded bg-cyan-700 py-2 px-4 text-white"
-                    disabled={isTranslating || !article.summary}
-                  >
-                    {isTranslating ? "Translating..." : "Translate"}
-                  </button>
+              )}
+              <div className="flex flex-row gap-4 w-full">
+                <div className="summary_box flex-1">
+                  <h3 className="font-satoshi font-semibold text-gray-600 text-base">
+                    Article Summary
+                  </h3>
+                  <p className="font-inter font-medium text-sm text-gray-700">
+                    {article.summary}
+                  </p>
                 </div>
-                {article.translatedSummary && (
+                <div className="flex flex-col gap-3 flex-1">
                   <div className="summary_box">
-                    <p className="font-inter font-medium text-sm text-gray-700">
-                      {article.translatedSummary.includes('Translation failed')
-                        ? `Error: ${article.translatedSummary}`
-                        : article.translatedSummary}
-                    </p>
+                    <h3 className="font-satoshi font-semibold text-gray-600 text-base">
+                      Article Translation ({language.toUpperCase()})
+                    </h3>
+                    {article.translatedSummary ? (
+                      <p className="font-inter font-medium text-sm text-gray-700">
+                        {article.translatedSummary.includes('Translation failed')
+                          ? `Error: ${article.translatedSummary}`
+                          : article.translatedSummary}
+                      </p>
+                    ) : (
+                      <p className="font-inter font-medium text-sm text-gray-500">
+                        No translation yet
+                      </p>
+                    )}
                   </div>
-                )}
+                  <div className="flex gap-2">
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value)}
+                      className="rounded bg-blue-100 py-1 px-2 text-sm text-cyan-600"
+                      disabled={isTranslating || !article.summary}
+                    >
+                      <option value="ur">Urdu</option>
+                      <option value="fr">French</option>
+                      <option value="ru">Russian</option>
+                      <option value="de">German</option>
+                      <option value="es">Spanish</option>
+                    </select>
+                    <button
+                      onClick={handleTranslate}
+                      className="rounded bg-cyan-700 py-2 px-4 text-white"
+                      disabled={isTranslating || !article.summary}
+                    >
+                      {isTranslating ? "Translating..." : "Translate"}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           )
