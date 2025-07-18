@@ -1,9 +1,7 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const rapidApiKey = import.meta.env.VITE_RAPID_API_KEY;
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const articleApi = createApi({
-  reducerPath: "articleApi",
+  reducerPath: 'articleApi',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_RAPID_API_ARTICLE_URL,
     prepareHeaders: (headers) => {
@@ -14,8 +12,10 @@ export const articleApi = createApi({
   }),
   endpoints: (builder) => ({
     getSummary: builder.query({
-      query: (params) =>
-        `/summarize?url=${encodeURIComponent(params.articleUrl)}&length=3`,
+      query: ({ articleUrl, length = 3 }) => ({
+        url: `?url=${encodeURIComponent(articleUrl)}&length=${length}`,
+        method: 'GET', // Explicitly set method if required
+      }),
     }),
   }),
 });
