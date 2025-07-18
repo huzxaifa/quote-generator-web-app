@@ -18,53 +18,93 @@ const Demo = () => {
   const [getSummary, { error, isFetching }] = useLazyGetSummaryQuery();
 
   useEffect(() => {
-    const articlesFromLocalStorage = JSON.parse(localStorage.getItem(`articles`));
-    if (articlesFromLocalStorage) {
-      const uniqueArticles = Object.values(
-        articlesFromLocalStorage.reduce((acc, article) => {
-          acc[article.url] = article;
-          return acc;
-        }, {})
-      );
-      setAllArticles(uniqueArticles);
-      localStorage.setItem(`articles`, JSON.stringify(uniqueArticles));
-    }
+    const fetchSummaries = async () => {
+      try {
+        // Load from localStorage first
+        const localArticles = JSON.parse(localStorage.getItem('articles')) || [];
+        console.log('LocalStorage articles:', localArticles); // Debug
+        setAllArticles(localArticles);
+
+        // Fetch from Supabase
+        const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/summaries`);
+        console.log('Supabase summaries:', response.data); // Debug
+        const supabaseArticles = response.data.map(item => ({
+          url: item.url,
+          summary: item.summary
+        }));
+        // Merge and deduplicate
+        const mergedArticles = [
+          ...supabaseArticles,
+          ...localArticles.filter(local => !supabaseArticles.some(s => s.url === local.url))
+        ];
+        const uniqueArticles = Object.values(
+          mergedArticles.reduce((acc, article) => {
+            acc[article.url] = article;
+            return acc;
+          }, {})
+        );
+        setAllArticles(uniqueArticles);
+        localStorage.setItem('articles', JSON.stringify(uniqueArticles));
+      } catch (error) {
+        console.error('Error fetching summaries:', error.message); // Debug
+        // Fallback to localStorage
+        const localArticles = JSON.parse(localStorage.getItem('articles')) || [];
+        setAllArticles(localArticles);
+      }
+    };
+    fetchSummaries();
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { data } = await getSummary({ articleUrl: article.url });
-    if (data?.summary) {
-      const newArticle = { ...article, summary: data.summary, translatedSummary: "" };
-      const isDuplicate = allArticles.some(
-        (existingArticle) => existingArticle.url === article.url
-      );
-      let updatedAllArticles;
-      if (isDuplicate) {
-        updatedAllArticles = allArticles.map((existingArticle) =>
-          existingArticle.url === article.url ? newArticle : existingArticle
-        );
-      } else {
-        updatedAllArticles = [newArticle, ...allArticles];
-      }
-      setArticle(newArticle);
-      setAllArticles(updatedAllArticles);
-      localStorage.setItem(`articles`, JSON.stringify(updatedAllArticles));
-      try {
-        await axios.post("http://localhost:3000/store-summary", {
-          url: article.url,
-          summary: data.summary,
-        });
-      } catch (error) {
-        console.error("Failed to store summary:", error);
+    try {
+      const { data, error: queryError } = await getSummary({ articleUrl: article.url });
+      if (queryError) {
+        console.error('Summary query error:', queryError); // Debug
         setArticle({
           ...article,
-          summaryError: error.response?.data || "Failed to store summary in Supabase",
+          summaryError: queryError.data?.error || 'Failed to generate summary',
+        });
+        return;
+      }
+      if (data?.summary) {
+        const newArticle = { ...article, summary: data.summary, translatedSummary: "", summaryError: "" };
+        const updatedAllArticles = [
+          newArticle,
+          ...allArticles.filter(a => a.url !== article.url)
+        ];
+        setArticle(newArticle);
+        setAllArticles(updatedAllArticles);
+        localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
+        try {
+          const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/store-summary`, {
+            url: article.url,
+            summary: data.summary,
+          });
+          console.log('Stored summary:', response.data); // Debug
+        } catch (error) {
+          console.error('Failed to store summary:', error.message); // Debug
+          setArticle({
+            ...article,
+            summaryError: error.response?.data || "Failed to store summary in Supabase",
+          });
+        }
+      } else {
+        setArticle({
+          ...article,
+          summaryError: "No summary returned from API",
         });
       }
+    } catch (error) {
+      console.error('Unexpected error in handleSubmit:', error.message); // Debug
+      setArticle({
+        ...article,
+        summaryError: "Unexpected error during summary generation",
+      });
     }
   };
 
+  // Rest of the file (handleCopy, handleTranslate, JSX) remains unchanged
   const handleCopy = (copyUrl) => {
     setCopied(copyUrl);
     navigator.clipboard.writeText(copyUrl);
@@ -75,7 +115,7 @@ const Demo = () => {
     if (!article.summary) return;
     setIsTranslating(true);
     try {
-      const response = await axios.post("http://localhost:3000/translate", {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/translate`, {
         text: article.summary,
         url: article.url,
         source: "en",
@@ -88,11 +128,11 @@ const Demo = () => {
       };
       const updatedAllArticles = [
         newArticle,
-        ...allArticles.filter((_, i) => i !== 0),
+        ...allArticles.filter(a => a.url !== article.url),
       ];
       setArticle(newArticle);
       setAllArticles(updatedAllArticles);
-      localStorage.setItem(`articles`, JSON.stringify(updatedAllArticles));
+      localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
       setIsTranslating(false);
     } catch (error) {
       console.error("Translation error:", error);
@@ -178,7 +218,7 @@ const Demo = () => {
             Well, that wasn't supposed to happen...
             <br />
             <span className="font-satoshi font-normal text-gray-700">
-              {error?.data?.error}
+              {error?.data?.error || 'An unexpected error occurred'}
             </span>
           </p>
         ) : (
