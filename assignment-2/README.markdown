@@ -2,6 +2,9 @@
 
 A web application that summarizes blog articles from URLs, stores summaries in Supabase, saves full article text in MongoDB, and translates summaries into multiple languages.
 
+## Vercel Deployment
+- https://blog-summarizer-frontend.vercel.app/
+
 ## Features
 
 - **Summarization**: Extracts and summarizes blog content from a provided URL.
