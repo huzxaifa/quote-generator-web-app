@@ -56,53 +56,56 @@ const Demo = () => {
   }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const { data, error: queryError } = await getSummary({ articleUrl: article.url });
-      if (queryError) {
-        console.error('Summary query error:', queryError); // Debug
-        setArticle({
-          ...article,
-          summaryError: queryError.data?.error || 'Failed to generate summary. Check API key or subscription.',
-        });
-        return;
-      }
-      if (data?.summary) {
-        const newArticle = { ...article, summary: data.summary, translatedSummary: "", summaryError: "" };
-        const updatedAllArticles = [
-          newArticle,
-          ...allArticles.filter(a => a.url !== article.url)
-        ];
-        setArticle(newArticle);
-        setAllArticles(updatedAllArticles);
-        localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
-        try {
-          const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/store-summary`, {
-            url: article.url,
-            summary: data.summary,
-          });
-          console.log('Stored summary:', response.data); // Debug
-        } catch (error) {
-          console.error('Failed to store summary:', error.message); // Debug
-          setArticle({
-            ...article,
-            summaryError: error.response?.data || "Failed to store summary in Supabase",
-          });
-        }
-      } else {
-        setArticle({
-          ...article,
-          summaryError: "No summary returned from API",
-        });
-      }
-    } catch (error) {
-      console.error('Unexpected error in handleSubmit:', error.message); // Debug
+  e.preventDefault();
+  try {
+    console.log('Fetching summary for URL:', article.url); // Debug
+    const { data, error: queryError } = await getSummary({ articleUrl: article.url });
+    if (queryError) {
+      console.error('Summary query error:', queryError, queryError.data, queryError.status); // Debug detailed error
       setArticle({
         ...article,
-        summaryError: "Unexpected error during summary generation",
+        summaryError: queryError.data?.error || `Failed to generate summary. Status: ${queryError.status}. Check API key or subscription.`,
+      });
+      return;
+    }
+    if (data?.summary) {
+      console.log('Summary received:', data.summary); // Debug
+      const newArticle = { ...article, summary: data.summary, translatedSummary: "", summaryError: "" };
+      const updatedAllArticles = [
+        newArticle,
+        ...allArticles.filter(a => a.url !== article.url)
+      ];
+      setArticle(newArticle);
+      setAllArticles(updatedAllArticles);
+      localStorage.setItem('articles', JSON.stringify(updatedAllArticles));
+      try {
+        const backendUrl = import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '');
+        const response = await axios.post(`${backendUrl}/store-summary`, {
+          url: article.url,
+          summary: data.summary,
+        });
+        console.log('Stored summary:', response.data);
+      } catch (error) {
+        console.error('Failed to store summary:', error.message, error.response?.data);
+        setArticle({
+          ...article,
+          summaryError: error.response?.data || "Failed to store summary in Supabase",
+        });
+      }
+    } else {
+      setArticle({
+        ...article,
+        summaryError: "No summary returned from API. Check URL or API limits.",
       });
     }
-  };
+  } catch (error) {
+    console.error('Unexpected error in handleSubmit:', error.message, error.stack);
+    setArticle({
+      ...article,
+      summaryError: "Unexpected error during summary generation. Check console for details.",
+    });
+  }
+};
 
   // Rest of the file (handleCopy, handleTranslate, JSX) remains unchanged
   const handleCopy = (copyUrl) => {
