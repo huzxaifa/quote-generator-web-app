@@ -9,7 +9,11 @@ const cheerio = require('cheerio');
 require('dotenv').config();
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: 'https://blog-summarizer-frontend.vercel.app',
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type']
+}));
 app.use(express.json());
 
 const supabase = createClient(
@@ -17,31 +21,30 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
-// API ENDPOINT to translate text
 app.post('/translate', async (req, res) => {
   const { text, source, target } = req.body;
   try {
     const translatedText = await translateText(text, source, target);
+    console.log('Translated text:', translatedText);
     res.send(translatedText);
   } catch (error) {
+    console.error('Translation failed:', error);
     res.status(500).send(`Translation failed: ${error.message}`);
   }
 });
 
-// API ENDPOINT to store summary and full text
 app.post('/store-summary', async (req, res) => {
   const { url, summary } = req.body;
   try {
-    // Fetch full blog text
     const response = await axios.get(url);
     const $ = cheerio.load(response.data);
     const fullText = $('article, .post-content, .entry-content, p').text().trim();
-    // Store summary in Supabase
     const summaryResult = await storeSummary(url, summary);
-    // Store full text in MongoDB
+    console.log('Stored summary in Supabase:', summaryResult);
     await storeFullText(url, fullText);
     res.send(summaryResult);
   } catch (error) {
+    console.error('Failed to store summary:', error);
     res.status(500).send(`Failed to store summary: ${error.message}`);
   }
 });
@@ -50,7 +53,7 @@ app.get('/summaries', async (req, res) => {
   try {
     const { data, error } = await supabase.from('summaries').select('*');
     if (error) throw error;
-    console.log('Fetched summaries:', data);
+    console.log('Fetched summaries from Supabase:', data);
     res.send(data);
   } catch (error) {
     console.error('Failed to fetch summaries:', error);
