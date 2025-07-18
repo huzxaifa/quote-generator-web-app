@@ -63,7 +63,7 @@ const Demo = () => {
         console.error('Summary query error:', queryError); // Debug
         setArticle({
           ...article,
-          summaryError: queryError.data?.error || 'Failed to generate summary',
+          summaryError: queryError.data?.error || 'Failed to generate summary. Check API key or subscription.',
         });
         return;
       }

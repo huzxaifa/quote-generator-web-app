@@ -1,16 +1,21 @@
 const express = require('express');
+const { createClient } = require('@supabase/supabase-js');
 const translateText = require('./services/translate');
 const { storeSummary } = require('./services/supabase');
 const { storeFullText } = require('./services/mongodb');
 const cors = require('cors');
 const axios = require('axios');
 const cheerio = require('cheerio');
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
-const PORT = 3000;
-
 app.use(express.json());
+
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 // API ENDPOINT to translate text
 app.post('/translate', async (req, res) => {
@@ -45,12 +50,12 @@ app.get('/summaries', async (req, res) => {
   try {
     const { data, error } = await supabase.from('summaries').select('*');
     if (error) throw error;
+    console.log('Fetched summaries:', data);
     res.send(data);
   } catch (error) {
+    console.error('Failed to fetch summaries:', error);
     res.status(500).send(`Failed to fetch summaries: ${error.message}`);
   }
 });
 
-app.listen(PORT, () => {
-  console.log("App is listening on the port", PORT);
-});
+module.exports = app;
