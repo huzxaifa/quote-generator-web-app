@@ -21,6 +21,10 @@ const supabase = createClient(
   process.env.SUPABASE_KEY
 );
 
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Backend is running' });
+}); 
+
 app.post('/translate', async (req, res) => {
   const { text, source, target } = req.body;
   try {
