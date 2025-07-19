@@ -1,0 +1,57 @@
+{
+  "name": "Recipe Generation Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/generate-recipe",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [100, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://api.x.ai/v1/grok",
+        "method": "POST",
+        "jsonBody": {
+          "prompt": "Generate a recipe with the following: ingredients={{$node['Webhook'].json['body']['ingredients']}}, cuisine={{$node['Webhook'].json['body']['cuisine']}}, dietary={{$node['Webhook'].json['body']['dietary']}}",
+          "model": "grok-3"
+        },
+        "headers": {
+          "Authorization": "Bearer {{$secrets.GROK_API_KEY}}"
+        }
+      },
+      "name": "Grok API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [300, 300]
+    },
+    {
+      "parameters": {
+        "response": {
+          "recipe": {
+            "title": "{{$node['Grok API'].json['title']}}",
+            "ingredients": "{{$node['Grok API'].json['ingredients']}}",
+            "instructions": "{{$node['Grok API'].json['instructions']}}",
+            "prepTime": "{{$node['Grok API'].json['prepTime']}}"
+          }
+        }
+      },
+      "name": "Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [500, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[{ "node": "Grok API", "type": "main", "index": 0 }]]
+    },
+    "Grok API": {
+      "main": [[{ "node": "Response", "type": "main", "index": 0 }]]
+    }
+  }
+}

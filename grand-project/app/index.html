@@ -1,0 +1,243 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/babel-standalone@7.18.9/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    const App = () => {
+      const [user, setUser] = useState(null);
+      const [email, setEmail] = useState('');
+      const [ingredients, setIngredients] = useState('');
+      const [cuisine, setCuisine] = useState('');
+      const [dietary, setDietary] = useState([]);
+      const [recipe, setRecipe] = useState(null);
+      const [recipes, setRecipes] = useState([]);
+      const [page, setPage] = useState('login');
+
+      // Check session
+      useEffect(() => {
+        const checkSession = async () => {
+          const token = localStorage.getItem('supabase.auth.token');
+          if (token) {
+            const res = await fetch('http://localhost:3000/auth/session', {
+              headers: { Authorization: token },
+            });
+            const data = await res.json();
+            if (data.user) setUser(data.user);
+          }
+        };
+        checkSession();
+      }, []);
+
+      // Send magic link
+      const sendMagicLink = async () => {
+        const res = await fetch('http://localhost:3000/auth/magic-link', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json();
+        alert(data.message || data.error);
+      };
+
+      // Generate recipe
+      const generateRecipe = async () => {
+        const res = await fetch('http://localhost:3000/ai/generate-recipe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ingredients, cuisine, dietary }),
+        });
+        const data = await res.json();
+        setRecipe(data.recipe);
+        setPage('recipe');
+      };
+
+      // Save recipe
+      const saveRecipe = async () => {
+        const token = localStorage.getItem('supabase.auth.token');
+        await fetch('http://localhost:3000/recipes', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: token },
+          body: JSON.stringify({ userId: user.id, recipe }),
+        });
+        alert('Recipe saved!');
+      };
+
+      // Load user recipes
+      const loadRecipes = async () => {
+        const token = localStorage.getItem('supabase.auth.token');
+        const res = await fetch(`http://localhost:3000/recipes/${user.id}`, {
+          headers: { Authorization: token },
+        });
+        const data = await res.json();
+        setRecipes(data);
+        setPage('profile');
+      };
+
+      // Render pages
+      if (!user && page === 'login') {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+              <h1 className="text-2xl font-bold mb-4">Recipe Generator</h1>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full p-2 mb-4 border rounded"
+              />
+              <button
+                onClick={sendMagicLink}
+                className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+              >
+                Send Magic Link
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="min-h-screen bg-gray-100">
+          <nav className="bg-blue-500 p-4 text-white flex justify-between">
+            <div>Recipe Generator</div>
+            <div>
+              <button onClick={() => setPage('home')} className="mr-4">Home</button>
+              <button onClick={loadRecipes} className="mr-4">Profile</button>
+              <button onClick={() => { localStorage.removeItem('supabase.auth.token'); setUser(null); setPage('login'); }}>
+                Logout
+              </button>
+            </div>
+          </nav>
+          {page === 'home' && (
+            <div className="p-8 max-w-2xl mx-auto">
+              <h1 className="text-2xl font-bold mb-4">Generate a Recipe</h1>
+              <textarea
+                value={ingredients}
+                onChange={(e) => setIngredients(e.target.value)}
+                placeholder="Enter ingredients (e.g., chicken, rice)"
+                className="w-full p-2 mb-4 border rounded"
+              />
+              <select
+                value={cuisine}
+                onChange={(e) => setCuisine(e.target.value)}
+                className="w-full p-2 mb-4 border rounded"
+              >
+                <option value="">Select Cuisine</option>
+                <option value="Italian">Italian</option>
+                <option value="Mexican">Mexican</option>
+                <option value="Vegan">Vegan</option>
+              </select>
+              <div className="mb-4">
+                <label className="mr-4">
+                  <input
+                    type="checkbox"
+                    checked={dietary.includes('Gluten-Free')}
+                    onChange={() => setDietary(dietary.includes('Gluten-Free') ? dietary.filter(d => d !== 'Gluten-Free') : [...dietary, 'Gluten-Free'])}
+                  /> Gluten-Free
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={dietary.includes('Vegan')}
+                    onChange={() => setDietary(dietary.includes('Vegan') ? dietary.filter(d => d !== 'Vegan') : [...dietary, 'Vegan'])}
+                  /> Vegan
+                </label>
+              </div>
+              <button
+                onClick={generateRecipe}
+                className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+              >
+                Generate Recipe
+              </button>
+            </div>
+          )}
+          {page === 'recipe' && recipe && (
+            <div className="p-8 max-w-2xl mx-auto">
+              <h1 className="text-2xl font-bold mb-4">{recipe.title}</h1>
+              <h2 className="text-xl mb-2">Ingredients</h2>
+              <ul className="list-disc pl-5 mb-4">
+                {recipe.ingredients.map((item, i) => <li key={i}>{item}</li>)}
+              </ul>
+              <h2 className="text-xl mb-2">Instructions</h2>
+              <ol className="list-decimal pl-5 mb-4">
+                {recipe.instructions.map((step, i) => <li key={i}>{step}</li>)}
+              </ol>
+              <p className="mb-4">Prep Time: {recipe.prepTime}</p>
+              <button
+                onClick={saveRecipe}
+                className="bg-green-500 text-white p-2 rounded hover:bg-green-600"
+              >
+                Save Recipe
+              </button>
+            </div>
+          )}
+          {page === 'profile' && (
+            <div className="p-8 max-w-2xl mx-auto">
+              <h1 className="text-2xl font-bold mb-4">Your Recipes</h1>
+              {recipes.map((r, i) => (
+                <div key={i} className="bg-white p-4 mb-4 rounded shadow">
+                  <h2 className="text-xl">{r.title}</h2>
+                  <p>{r.prepTime}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    };
+
+    ReactDOM.render(<App />, document.getElementById('root'));
+  </script>
+</body>
+</html>
