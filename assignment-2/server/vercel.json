@@ -9,25 +9,14 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/index.js"
-    },
-    {
-      "src": "/",
-      "dest": "/index.js"
+      "dest": "/index.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "https://blog-summarizer-frontend.vercel.app",
+        "Access-Control-Allow-Methods": "GET, POST",
+        "Access-Control-Allow-Headers": "Content-Type"
+      }
     }
   ],
-
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Origin", "value": "https://blog-summarizer-frontend.vercel.app" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST" },
-        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
-      ]
-    }
-  ],
-  
   "redirects": [
     {
       "source": "/:path*//",
