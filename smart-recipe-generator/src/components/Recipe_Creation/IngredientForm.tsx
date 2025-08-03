@@ -155,7 +155,14 @@ export default function IngredientForm({
             <div className="flex justify-end w-full">
                 <NewIngredientDialog
                     ingredientList={ingredientList}
-                    updateIngredientList={(newIngredient) => setIngredientList([...ingredientList, newIngredient])}
+                    updateIngredientList={(newIngredient) => {
+                        setIngredientList([...ingredientList, newIngredient]);
+                        // Add the new ingredient to the selected list as well
+                        updateIngredients([
+                            ...ingredients,
+                            { name: newIngredient.name, id: uuidv4() }
+                        ]);
+                    }}
                 />
             </div>
             <div className="mt-4 w-full">

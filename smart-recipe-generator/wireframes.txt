@@ -1,0 +1,58 @@
+Wireframes for Recipe Generator
+
+1. Login Page
+   - Header: App logo (Recipe Generator)
+   - Body: Email input field, "Send Magic Link" button
+   - Footer: Link to terms/privacy policy
+   Layout:
+   ```
+   [Logo]
+   [Email Input]
+   [Send Magic Link Button]
+   [Terms | Privacy]
+   ```
+
+2. Home Page
+   - Header: Nav bar (Home, Profile, Logout)
+   - Body: Form with:
+     - Textarea: "Enter ingredients (e.g., chicken, rice)"
+     - Dropdown: Cuisine (Italian, Mexican, etc.)
+     - Checkboxes: Dietary (Vegan, Gluten-Free, etc.)
+     - Button: "Generate Recipe"
+   Layout:
+   ```
+   [Home | Profile | Logout]
+   [Ingredients Textarea]
+   [Cuisine Dropdown]
+   [Dietary Checkboxes]
+   [Generate Recipe Button]
+   ```
+
+3. Recipe Display Page
+   - Header: Nav bar
+   - Body: Recipe card with:
+     - Title
+     - Ingredients list
+     - Instructions (numbered steps)
+     - Prep time
+     - Save button
+   Layout:
+   ```
+   [Home | Profile | Logout]
+   [Recipe Title]
+   [Ingredients List]
+   [Instructions]
+   [Prep Time]
+   [Save Recipe Button]
+   ```
+
+4. Profile Page
+   - Header: Nav bar
+   - Body: List of saved recipes (clickable cards)
+   - Preferences section: Update cuisine/dietary preferences
+   Layout:
+   ```
+   [Home | Profile | Logout]
+   [Saved Recipes List]
+   [Preferences Form]
+   ```

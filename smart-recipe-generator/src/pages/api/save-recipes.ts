@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import mongoose from 'mongoose';
-import { generateImages, generateRecipeTags } from '../../lib/openai';
+import { generateImages, generateRecipeTags } from '../../lib/openRouter';
 
 import { apiMiddleware } from '../../lib/apiMiddleware';
 import { connectDB } from '../../lib/mongodb';
@@ -32,7 +32,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse, session: any) 
 
         // Run `generateRecipeTags` asynchronously in the background
         savedRecipes.forEach((r) => {
-            generateRecipeTags(r as ExtendedRecipe, session.user.id)
+            generateRecipeTags(r as ExtendedRecipe)
                 .catch((error) => console.error(`Failed to generate tags for recipe ${r.name}:`, error));
         });
 

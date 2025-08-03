@@ -73,7 +73,7 @@ describe('The Header', () => {
     it('contains a buy me a coffee link', () => {
         render(<Header user={{ name: 'mock username' }} />)
         const link = screen.getByRole('link', { name: /buy/i })
-        expect(link).toHaveAttribute('href', 'https://www.buymeacoffee.com/dereje')
+        expect(link).toHaveAttribute('href', 'https://www.buymeacoffee.com/huzaifa')
     })
 
 })

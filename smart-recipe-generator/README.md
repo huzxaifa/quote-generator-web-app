@@ -53,7 +53,7 @@
 
 ### 1. **Clone the Repository**
 ```bash
-git clone https://github.com/Dereje1/smart-recipe-generator.git
+git clone https://github.com/huzxaifa/Nexium_Internship/tree/main/smart-recipe-generator.git
 cd smart-recipe-generator
 ```
 

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { openRouterChat } from "../../lib/openRouter";
 import Ingredient from '../../models/ingredient';
+import { validateIngredientWithHF } from '../../lib/huggingFace';
 
 export default async function handler(
   req: NextApiRequest,
@@ -12,27 +13,23 @@ export default async function handler(
   if (!name) return res.status(400).json({ message: 'Ingredient name is required' });
 
   try {
-    // 1.  Ask OpenRouter
-    const reply = await openRouterChat([{
-      role: 'user',
-      content: `Return JSON: {"isValid":true/false,"possibleVariations":[...]} for ingredient "${name}".`
-    }]);
-    const { isValid, possibleVariations = [] } = JSON.parse(reply);
+    // 1. Validate with Hugging Face
+    const { isValid, suggested } = await validateIngredientWithHF(name);
 
-    // 2.  Already in DB?
+    // 2. Already in DB?
     const exists = await Ingredient.findOne({ name });
     if (exists) {
       return res.json({ message: 'Error: This ingredient already exists' });
     }
 
-    // 3.  Invalid?
+    // 3. Invalid?
     if (!isValid) {
-      return res.json({ message: 'Invalid', suggested: possibleVariations });
+      return res.json({ message: 'Invalid', suggested });
     }
 
-    // 4.  Add new
+    // 4. Add new
     const newIngredient = await Ingredient.create({ name });
-    return res.json({ message: 'Success', newIngredient, suggested: possibleVariations });
+    return res.json({ message: 'Success', newIngredient, suggested });
 
   } catch (err) {
     console.error(err);
