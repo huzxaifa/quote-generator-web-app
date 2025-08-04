@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import mongoose from 'mongoose';
-import { generateImages, generateRecipeTags } from '../../lib/openRouter';
+import { generateImages } from '../../lib/openRouter';
 
 import { apiMiddleware } from '../../lib/apiMiddleware';
 import { connectDB } from '../../lib/mongodb';
@@ -13,8 +13,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse, session: any) 
         const { recipes } = req.body;
         const recipeNames = recipes.map(({ name, ingredients }: Recipe) => ({ name, ingredients }));
 
-        // Generate images using OpenAI
-        console.info('Getting images from OpenAI...');
+        // Generate images using Unsplash
+        console.info('Getting images from Unsplash...');
         const imageResults = await generateImages(recipeNames, session.user.id);
         
         // Update recipe data with image links and owner information
@@ -30,11 +30,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse, session: any) 
         const savedRecipes = await recipe.insertMany(updatedRecipes);
         console.info(`Successfully saved ${recipes.length} recipes to MongoDB`);
 
-        // Run `generateRecipeTags` asynchronously in the background
-        savedRecipes.forEach((r) => {
-            generateRecipeTags(r as ExtendedRecipe)
-                .catch((error) => console.error(`Failed to generate tags for recipe ${r.name}:`, error));
-        });
+        // Remove the generateRecipeTags call for now
+        // savedRecipes.forEach((r) => {
+        //     generateRecipeTags(r as ExtendedRecipe, session.user.id)
+        //         .catch((error) => console.error(`Failed to generate tags for recipe ${r.name}:`, error));
+        // });
 
         // Respond with success message
         res.status(200).json({ status: 'Saved Recipes and generated the Images!' });

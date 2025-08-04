@@ -25,6 +25,16 @@ const nextConfig = {
                 hostname: 'www.gravatar.com',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'images.unsplash.com',
+                pathname: '/**',
+            },
+            {
+                protocol: 'https',
+                hostname: 'api.unsplash.com',
+                pathname: '/**',
+            },
         ],
         minimumCacheTTL: 2_592_000,          // 30 days
         deviceSizes: [320, 420, 768, 1024, 1280, 1440, 1920],
