@@ -28,10 +28,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse, session: any) 
     
     console.info("Synthesizing text to speech.....")
     const leanRecipe = recipe.toObject() as unknown as ExtendedRecipe;
-    const audioBuffer = await getTTS(leanRecipe, session.user.id)
+    // Fix 1: Pass the recipe instructions as text to getTTS
+    const audioBuffer = await getTTS(leanRecipe.instructions.join(" "))
     
-    // Return the audio buffer directly
-    return res.status(200).json({ audio: audioBuffer.toString("base64") });
+    // Fix 2: Ensure audioBuffer is treated as a Buffer if it's not already
+    // The getTTS function in openai.ts currently returns a string. 
+    // If it were to return a Buffer, toString("base64") would be correct.
+    // For now, assuming getTTS returns a string (URL or base64 string directly).
+    // If getTTS returns a URL, we should return the URL. If it returns a base64 string, return that.
+    // Based on the previous openai.ts, it returns a string (placeholder URL).
+    return res.status(200).json({ audio: audioBuffer });
   } catch (error) {
     console.error('Error handling TTS request:', error);
     return res.status(500).json({ message: 'Error generating or uploading audio' });

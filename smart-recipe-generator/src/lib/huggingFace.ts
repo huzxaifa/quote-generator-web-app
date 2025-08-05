@@ -79,30 +79,49 @@ function generateCreativeRecipeName(ingredients: string[]): string {
     return creativeCombinations[Math.floor(Math.random() * creativeCombinations.length)];
 }
 
-export async function validateIngredientWithHF(ingredient: string): Promise<boolean> {
+export async function validateIngredientWithHF(ingredient: string): Promise<{ isValid: boolean; suggested: string | null }> {
     try {
         // Use Hugging Face to validate if the input is a valid food ingredient
-        const prompt = `Is "${ingredient}" a valid food ingredient that can be used in cooking? Answer only with "yes" or "no".`;
+        const prompt = `Is "${ingredient}" a valid food ingredient that can be used in cooking? Answer only with "yes" or "no". If not, suggest a valid alternative.`;
         
         const response = await hf.textGeneration({
             model: 'gpt2',
             inputs: prompt,
             parameters: {
-                max_new_tokens: 10,
+                max_new_tokens: 50,
                 temperature: 0.1,
                 do_sample: false
             }
         });
 
-        const answer = response.generated_text.toLowerCase();
-        const isValid = answer.includes('yes') || isCommonIngredient(ingredient);
+        const generatedText = response.generated_text.toLowerCase();
+        let isValid = generatedText.includes('yes');
+        let suggested: string | null = null;
+
+        if (!isValid) {
+            const suggestionMatch = generatedText.match(/suggest\s*(?:a\s*valid\s*)?alternative\s*:\s*([a-zA-Z0-9\s,]+)/i);
+            if (suggestionMatch && suggestionMatch[1]) {
+                suggested = suggestionMatch[1].trim();
+            } else {
+                // Fallback if no specific suggestion is parsed from HF response
+                suggested = isCommonIngredient(ingredient) ? null : 'Please enter a valid food ingredient.';
+            }
+        }
         
-        console.log(`Ingredient validation for "${ingredient}": ${isValid}`);
-        return isValid;
+        // Always check against common ingredients as a strong fallback
+        if (isCommonIngredient(ingredient)) {
+            isValid = true;
+            suggested = null; // If it's a common ingredient, no suggestion needed
+        }
+
+        console.log(`Ingredient validation for "${ingredient}": isValid=${isValid}, suggested=${suggested}`);
+        return { isValid, suggested };
     } catch (error) {
         console.error('Hugging Face ingredient validation error:', error);
-        // Fallback to simple validation
-        return isCommonIngredient(ingredient);
+        // Fallback to simple validation and a generic suggestion on error
+        const isValid = isCommonIngredient(ingredient);
+        const suggested = isValid ? null : 'Could not validate ingredient. Please try a common food item.';
+        return { isValid, suggested };
     }
 }
 

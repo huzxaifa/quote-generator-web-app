@@ -1,4 +1,3 @@
-// next.config.mjs
 /** @type {import('next').NextConfig} */
 
 const isE2E = process.env.E2E === '1';
@@ -39,6 +38,23 @@ const nextConfig = {
         minimumCacheTTL: 2_592_000,          // 30 days
         deviceSizes: [320, 420, 768, 1024, 1280, 1440, 1920],
         imageSizes: [16, 32, 48, 64, 96],
+    },
+    webpack: (config, { isServer }) => {
+        if (!isServer) {
+            config.resolve.fallback = {
+                dns: false,
+                fs: false,
+                net: false,
+                tls: false,
+                kerberos: false,
+                '@mongodb-js/zstd': false,
+                '@aws-sdk/credential-providers': false,
+                'snappy': false,
+                'mongodb-client-encryption': false,
+                // Add other Node.js modules if they cause issues
+            };
+        }
+        return config;
     },
 };
 
